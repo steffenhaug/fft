@@ -1,0 +1,32 @@
+\documentclass{standalone}
+
+\begin{document}
+\begin{tikzpicture}
+\usetikzlibrary{decorations.pathreplacing,angles,quotes}
+\usetikzlibrary{shapes.geometric,shapes.misc}
+\usetikzlibrary{calc}
+
+\def\GRIDSIZE{1.625}
+\draw[lightgray,->] (0, -\GRIDSIZE) -- (0, \GRIDSIZE)
+    node[left] {\tiny Im};
+\draw[lightgray,->] (-\GRIDSIZE, 0) -- (\GRIDSIZE, 0)
+    node[below] {\tiny Re};
+\draw (\GRIDSIZE, \GRIDSIZE) node {\scriptsize $\mathbb C$};
+
+    \draw[gray] (0, 0) circle (1);
+
+\def\TH{3.14}
+
+\def\R{0.5}
+\draw[orange,domain=0:\TH]
+    plot ({\R*cos(deg(\x))}, {\R*sin(deg(\x))})
+    node[above, xshift=-.2em] {\scriptsize $\pi$};
+
+\coordinate (P) at ({cos(deg(\TH))}, {sin(deg(\TH))});
+    \draw[orange] (0, 0) -- (P);
+\draw[fill=white] (P) circle (.05)
+    node[below, xshift=-.4em, yshift=.1825em] {\scriptsize {$-1$} };
+
+
+\end{tikzpicture}
+\end{document}

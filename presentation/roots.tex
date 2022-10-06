@@ -1,0 +1,27 @@
+\documentclass{standalone}
+
+\begin{document}
+\begin{tikzpicture}
+\usetikzlibrary{decorations.pathreplacing,angles,quotes}
+\usetikzlibrary{shapes.geometric,shapes.misc}
+\usetikzlibrary{calc}
+
+\def\GRIDSIZE{1.625}
+\draw[lightgray,->] (0, -\GRIDSIZE) -- (0, \GRIDSIZE)
+    node[left] {\tiny Im};
+\draw[lightgray,->] (-\GRIDSIZE, 0) -- (\GRIDSIZE, 0)
+    node[below] {\tiny Re};
+\draw (\GRIDSIZE, \GRIDSIZE) node {\scriptsize $\mathbb C$};
+
+\draw[gray] (0, 0) circle (1);
+
+\def\N{5}
+\foreach \n in {0,...,\N}
+{
+    \coordinate (Z) at ({cos(360*\n/\N)}, {sin(360*\n/\N)});
+    \draw[fill=white] (Z) circle (.05);
+}
+
+\end{tikzpicture}
+\end{document}
+

@@ -1,0 +1,219 @@
+\documentclass[14pt]{beamer}
+\usepackage{mathtools}
+\usepackage{emoji}
+\usepackage{xcolor}
+\usepackage{xfrac}
+\usepackage{csquotes}
+
+% This lets us \includestandalone tikz pictures in standalone documents.
+\usepackage{tikz}
+\usepackage[mode=buildnew]{standalone}
+
+\makeatother
+\renewcommand{\thefootnote}{
+    \ifcase\value{footnote}
+        \or*
+        \or**
+        \or***
+        \or****
+    \fi}
+\makeatletter
+
+\usefonttheme{serif}
+\setbeamertemplate{navigation symbols}{}%remove navigation symbols
+
+\setbeamerfont{title}{shape=\sc}
+\setbeamerfont{frametitle}{shape=\sc}
+
+\setbeamercolor{title}{fg=black}
+\setbeamercolor{frametitle}{fg=black}
+
+\newcommand{\Seq}[1]{\left\{ {#1} \right\}}
+\newcommand{\Exp}[1]{e^{#1}}
+
+\title{The Fourier transform and the FFT algorithm}
+\author{Steffen Haug}
+\date{}
+
+\begin{document}
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}
+    \centering
+    \textsc{The Fourier transform}\\[1em]
+    \begin{equation}
+        \hat f (\xi) = \int\displaylimits_{\mathbb R} f(t) \Exp{-2 \pi i \xi t } dt
+    \end{equation}\\[1em]
+    % The fourier transform: Incredibly important for engineering applications
+    % - The fourier transform f_hat gives for a frequency xi the "amount" of xi in the signal
+    % - Unfeasible to evaluate automatically analytically
+
+    \pause
+    Analytic evaluation generally not feasible.
+\end{frame}
+
+\begin{frame}
+    \begin{equation*}
+        \hat f (\xi) = \int\displaylimits_{\mathbb R} f(t) \Exp{-2 \pi i \xi t } dt
+    \end{equation*}\\[1em]
+
+    Most engineering applications use its discrete counterpart -- the DFT:
+    \begin{equation}
+    X_k = \sum_{n=0}^{N-1} x_n \Exp{-\frac {2 \pi i k n} N}
+    \label{eq:dft}
+    \end{equation}
+    % The sequence X is a sort of discrete counterpart to f_hat
+    % Imagine x samples f
+\end{frame}
+
+\begin{frame}
+    \begin{equation*}
+    X_k = \sum_{n=0}^{N-1} x_n \Exp{-\frac {2 \pi i k n} N}
+    \label{eq:dft}
+    \end{equation*}\\[1em]
+    \centering
+    We want a way to compute this \textit{efficiently}.
+\end{frame}
+
+
+
+\begin{frame}
+    \centering
+    \textsc{\large Preliminaries}\\
+    \textit{\scriptsize Eulers formula and the roots of unity}
+\end{frame}
+
+
+% eulers identiry: special case of eulers formula exp(ix) = cos = isin
+
+\begin{frame}
+    \centering
+    \textsc{Eulers identity}\\[1em]
+
+    \begin{equation}
+        e^{i \pi} = -1
+    \end{equation}
+\end{frame}
+
+\begin{frame}
+    \begin{equation*}
+        e^{i \pi} = -1
+    \end{equation*}\\[1em]
+
+    \centering
+    Just a special case of $e^{i \vartheta}$ when $\vartheta = \pi$.
+    \begin{equation}
+        e^{i\vartheta} = \cos{\vartheta} + i \sin{\vartheta}
+    \end{equation}
+\end{frame}
+
+
+\begin{frame}
+    \begin{equation*}
+        e^{i\vartheta} = \cos{\vartheta} + i \sin{\vartheta}
+    \end{equation*}
+    \begin{figure}
+        \centering
+        \includestandalone[width=.625\textwidth]{euler}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \begin{equation*}
+        e^{i\pi} = -1
+    \end{equation*}
+    \begin{figure}
+        \centering
+        \includestandalone[width=.625\textwidth]{euler_pi}
+    \end{figure}
+\end{frame}
+
+% roots of unity: exp(in/N) solutions to x^N = 1
+% remember complex multiplication: multiply length (=1) and add angles. Arg xy = Arg x + Arg y
+% symmetry: N even => each root has a opposite partner with twice the angle which just has a negative sign
+
+\begin{frame}
+    \centering
+    \textsc{The roots of unity}\\[1em]
+    \begin{equation*}
+        z^N = 1
+    \end{equation*}
+\end{frame}
+
+\begin{frame}
+    \begin{equation*}
+        z^N = 1
+    \end{equation*}
+
+    \begin{figure}
+        \centering
+        \includestandalone[width=.5\textwidth]{roots}
+    \end{figure}
+    \centering
+
+    \textsc{Solutions}: $e^\frac {2\pi i n}{N}$ for $n$ in $0, \dots, N-1$.
+\end{frame}
+
+% \begin{frame}
+%     \centering
+%     \textsc{To verify}\\[1em]
+%     \begin{align*}
+%         \left(e^\frac{2 \pi i n} N\right)^N &=
+%             \left(e^\frac{2 \pi i N} N\right)^n \\
+%             &= \left(e^{2 \pi i}\right)^n\\
+%             &= 1^n \\
+%             &= 1
+%     \end{align*}
+% \end{frame}
+
+\begin{frame}
+    \centering
+    \textsc{Important point}
+    \begin{figure}
+        \centering
+        \includestandalone[width=.5\textwidth]{roots_mirror}
+    \end{figure}
+    When N is even, every root has a ``friend'' with the opposite sign.
+\end{frame}
+
+
+\begin{frame}
+    \centering
+    \textsc{\large The key idea}\\
+    \textit{\scriptsize Decomposing the DFT}
+\end{frame}
+
+\begin{frame}
+    \begin{center}
+        \textsc{Simplifying assumption}\\[.5em]
+        $N$ is a power of two\\[1.5em]
+    \end{center}
+\end{frame}
+
+\begin{frame}
+    Let $W = e^\frac{-2 \pi i} N$ (notation from Cooley-Tukey).
+
+    We can restate \eqref{eq:dft} as
+    \begin{equation}
+        X_k = \sum_n x_n W^{nk}
+    \end{equation}
+\end{frame}
+
+\begin{frame}
+    \centering
+    \textsc{\large Gaining speed}\\
+    \textit{\scriptsize Reusing intermediate results}
+\end{frame}
+
+\begin{frame}
+    \frametitle{References}
+
+    \begin{itemize}
+        \item \textbf{Cooley \& Tukey}: .....
+    \end{itemize}
+\end{frame}
+
+
+\end{document}
