@@ -220,6 +220,16 @@
 \end{frame}
 
 \begin{frame}
+    \begin{center}
+        \textsc{Foreshadowing}\\[.5em]
+        \scriptsize{\textsc{The goal} is to recursively decompse the DFT in such a way that {\em intermediate calculations}
+        are {\em overlapping} or {\em symmetrically opposite} on the unit circle.}\\[1em]
+
+        \tiny{Thus, they may be reused directly or by simply a change of sign.}
+    \end{center}
+\end{frame}
+
+\begin{frame}
     \begin{equation*}
         X_k = \sum_{n=0}^{N-1} x_n W^{nk}
     \end{equation*}
@@ -263,16 +273,6 @@
     \textit{\scriptsize Decomposing the DFT}
 \end{frame}
 
-
-\begin{frame}
-    \begin{center}
-        \textsc{Foreshadowing}\\[.5em]
-        \scriptsize{\textsc{The goal} is to recursively decompse the DFT in such a way that {\em intermediate calculations}
-        are {\em overlapping} or {\em symmetrically opposite} on the unit circle.}\\[1em]
-
-        \tiny{Thus, they may be reused directly or by simply a change of sign.}
-    \end{center}
-\end{frame}
 
 \begin{frame}
     \centering
@@ -501,13 +501,37 @@
     }
 \end{frame}
 
+\begin{frame}
+    \centering
+    \textsc{Complexity analysis}
+
+    {\tiny Just for the record}
+
+    $$
+    T(n) = \left\{
+        \begin{array}{ll}
+            2T(n/2) + n & \text{if } n > 1 \\
+            1           & \text{if } n = 1
+        \end{array}
+    \right.
+    $$
+    {\tiny This is not very deep -- straight forward application of the \textsc{Master Theorem}:}
+    $$
+    \log_2 2 = 1 \implies T(n) = O(n \log n)
+    $$
+\end{frame}
+
 
 \begin{frame}
     \frametitle{References}
+    \scriptsize
+    \textbf{Cooley \& Tukey}: \textit{An algorithm for the machine calculation of complex Fourier series}
 
-    \begin{itemize}
-        \item \textbf{Cooley \& Tukey}: .....
-    \end{itemize}
+    \textbf{Johnson \& Frigo}: \textit{Implementing FFTs in practice}
+
+    \textbf{Falch}: \textit{The Discrete and Fast Fourier Transforms}
+
+    \textbf{Bogart \& Stein}: \textit{Discrete Math in Computer Science} (Section 5.2: The Master theorem)
 \end{frame}
 
 
