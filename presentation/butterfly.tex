@@ -1,0 +1,114 @@
+\documentclass{standalone}
+
+\usetikzlibrary{decorations.pathreplacing,angles,quotes}
+\usetikzlibrary{shapes.geometric,shapes.misc}
+\usetikzlibrary{calc}
+
+\begin{document}
+\begin{tikzpicture}
+    % invisible frame so text sticking out doesnt push the figure off-center
+    \draw[opacity=0.0] (-1, 1) rectangle (8, -5);
+
+    \onslide<+->{
+        \foreach \i in {0,1,2,3} {
+            \pgfmathsetmacro\n{int(2*\i)}
+            \draw [fill=\MyBlue] (\i, 0) circle (.05)
+                node[above] {\scriptsize $x_\n$};
+        }
+
+        \foreach \i in {0,1,2,3} {
+            \pgfmathsetmacro\n{int(2*\i+1)}
+            \draw [fill=\MyOrange] (\i+4, 0) circle (.05)
+                node[above] {\scriptsize $x_\n$};
+        }
+    }
+
+    \onslide<+->{
+
+        \def\drect{.3}
+        \draw[] (0-\drect,-1) rectangle (3+\drect, -2)
+            node[pos=.5] {\small{N/2-point FFT}};
+
+        \draw[] (4-\drect,-1) rectangle (7+\drect, -2)
+            node[pos=.5] {\small{N/2-point FFT}};
+
+        \foreach \i in {0,1,2,3} {
+            \draw [fill=\MyBlue] ({\i}, -3) circle (.05)
+                node[left,yshift=.4em]
+                    {\scriptsize \color{\MyBlue} $E_\i$};
+
+            \draw[->, shorten < = 2pt, shorten > = 1pt]
+                (\i,0)--(\i,-1);
+
+            \draw[->, shorten < = 1pt, shorten > = 2pt]
+                (\i,-2)--(\i,-3);
+        }
+
+        \foreach \i in {0,1,2,3} {
+            \draw [fill=\MyOrange] ({\i+4}, -3) circle (.05)
+                node[right,xshift=-.25em,yshift=.4em]
+                    {\scriptsize $W^\i\!{\color{\MyOrange}O_\i}$};
+
+            \draw[->, shorten < = 2pt, shorten > = 1pt]
+                (\i+4,0)--(\i+4,-1);
+
+            \draw[->, shorten < = 1pt, shorten > = 2pt]
+                (\i+4,-2)--(\i+4,-3);
+        }
+    }
+
+    \onslide<+>{
+        \draw[->, shorten < = 2pt, shorten > = 2pt,thick]
+            (0, -3) -- (0, -4);
+
+        \draw[->, shorten < = 2.2pt, shorten > = 2pt,thick]
+            (4, -3) -- (0, -4);
+
+        \draw (0, -4) circle (.05)
+            node[below] {\small $X_0$};
+    }
+
+    \onslide<+->{
+        \foreach \i in {0,1,2,3} {
+
+        \draw[->, shorten < = 2pt, shorten > = 2pt]
+            (\i, -3) -- (\i, -4);
+
+        \draw[->, shorten < = 2.2pt, shorten > = 2pt]
+            (\i+4, -3) -- (\i, -4);
+
+        \draw (\i, -4) circle (.05)
+            node[below] {\small $X_\i$};
+        }
+    }
+
+    \onslide<+>{
+        \draw[->, shorten < = 2pt, shorten > = 2pt,thick]
+            (4, -3) -- (4, -4);
+
+        \draw[->, shorten < = 2.2pt, shorten > = 2pt,thick]
+            (0, -3) -- (4, -4);
+
+        \draw (4, -4) circle (.05)
+            node[below] {\small $X_5$};
+    }
+
+
+    \onslide<+->{
+        \foreach \i in {0,1,2,3} {
+
+        \draw[->, shorten < = 2pt, shorten > = 2pt]
+            (\i+4, -3) -- (\i+4, -4);
+
+        \draw[->, shorten < = 2.2pt, shorten > = 2pt]
+            (\i, -3) -- (\i+4, -4);
+
+        \pgfmathsetmacro\n{int(\i+4)}
+
+        \draw (\i+4, -4) circle (.05)
+            node[below] {\small $X_\n$};
+        }
+    }
+\end{tikzpicture}
+\end{document}
+

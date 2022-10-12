@@ -20,18 +20,22 @@
 \foreach \n in {0,...,\N}
 {
     \coordinate (Z) at ({cos(-360*\n/\N)}, {sin(-360*\n/\N)});
-    \draw[fill=white] (Z) circle (.05);
+    \ifthenelse{\n=4} {
+        \draw[fill=\MyBlue] (Z) circle (.05);
+    }{
+        \draw[fill=white] (Z) circle (.05);
+    }
 }
 
 
 \foreach \n in {0,...,7}
 {
-    \def\dr{1.3}
+    \def\dr{1.4}
     \coordinate (Z) at ({\dr*cos(-360*\n/\N)}, {\dr*sin(-360*\n/\N)});
-    \ifthenelse{\n=0 \OR \n=4} {
-        \node[yshift=.1em] at (Z) {\tiny $W^{\n}$};
+    \ifthenelse{\n=4} {
+        \node[yshift=.4em] at (Z) {\tiny $W^{N/2}$};
     }{
-        \node at (Z) {\tiny $W^{\n}$};
+
     }
 }
 

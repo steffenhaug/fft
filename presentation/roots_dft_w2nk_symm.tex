@@ -1,0 +1,47 @@
+\documentclass{standalone}
+
+\begin{document}
+\begin{tikzpicture}
+\usetikzlibrary{decorations.pathreplacing,angles,quotes}
+\usetikzlibrary{shapes.geometric,shapes.misc}
+\usetikzlibrary{calc}
+
+\def\GRIDSIZE{1.625}
+\draw[SuperLightGray,->] (0, -\GRIDSIZE) -- (0, \GRIDSIZE)
+    node[left] {\tiny Im};
+\draw[SuperLightGray,->] (-\GRIDSIZE, 0) -- (\GRIDSIZE, 0)
+    node[below] {\tiny Re};
+\draw (\GRIDSIZE, \GRIDSIZE) node {\scriptsize $\mathbb C$};
+\draw (-\GRIDSIZE, \GRIDSIZE) node {\scriptsize $n=1$};
+
+\draw[lightgray] (0, 0) circle (1);
+
+\def\N{8}
+\foreach \n in {0,...,\N}
+{
+    \coordinate (Z) at ({cos(360*\n/\N)}, {sin(360*\n/\N)});
+    \ifthenelse{\n=8 \OR \n=2 \OR \n=4 \OR \n=6}{
+        \draw[fill=\MyGreen] (Z) circle (.05);
+    }{
+        \draw[fill=white] (Z) circle (.05);
+    }
+}
+
+\foreach \n in {0,...,3}
+{
+    \def\dr{1.3}
+    \coordinate (Z) at ({\dr*cos(-360*2*\n/\N)}, {\dr*sin(-360*2*\n/\N)});
+
+    \pgfmathsetmacro\nn{int(2*\n)}
+    \pgfmathsetmacro\kN{int(4+\n)}
+
+    \ifthenelse{\n=0 \OR \n=2} {
+        \node[yshift=.5em] at (Z) {\tiny $W^{\nn} \; (k=\n,\kN)$};
+    }{
+        \node at (Z) {\tiny $W^{\nn} \; (k=\n,\kN)$};
+    }
+}
+
+\end{tikzpicture}
+\end{document}
+

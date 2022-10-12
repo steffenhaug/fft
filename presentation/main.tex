@@ -1,13 +1,27 @@
+\PassOptionsToPackage{dvipsnames}{xcolor}
 \documentclass[14pt]{beamer}
+
+\usepackage{amsmath}
 \usepackage{mathtools}
 \usepackage{emoji}
-\usepackage{xcolor}
 \usepackage{xfrac}
+\usepackage{cancel}
 \usepackage{csquotes}
+
+\usepackage[]{xcolor}
+\def\MyGreen{ForestGreen}
+\def\MyRed{Red}
+\def\MyOrange{BurntOrange}
+\def\MyBlue{NavyBlue}
+\definecolor{SuperLightGray}{rgb}{0.9,0.9,0.9}
+
+\usepackage{calc}
 
 % This lets us \includestandalone tikz pictures in standalone documents.
 \usepackage{tikz}
+\usetikzlibrary{tikzmark}
 \usepackage[mode=buildnew]{standalone}
+\usepackage{xifthen}
 
 \makeatother
 \renewcommand{\thefootnote}{
@@ -153,7 +167,7 @@
     \end{figure}
     \centering
 
-    \textsc{Solutions}: $e^\frac {2\pi i n}{N}$ for $n$ in $0, \dots, N-1$.
+    \textsc{Solutions}: $\left(\!e^\frac {2\pi i}{N}\right)^{\!\!n}$ for $n$ in $0, \dots, N-1$.
 \end{frame}
 
 % \begin{frame}
@@ -168,16 +182,80 @@
 %     \end{align*}
 % \end{frame}
 
+% \begin{frame}
+%     \centering
+%     \textsc{Important point 1}
+%     \begin{figure}
+%         \centering
+%         \includestandalone[width=.5\textwidth]{roots_mirror}
+%     \end{figure}
+%     When N is even, every root has a ``friend'' with the opposite sign.
+% \end{frame}
+
+% \begin{frame}
+%     \centering
+%     \textsc{Important point 2}
+%     \begin{figure}
+%         \centering
+%         \raisebox{-.5\height}{ \includestandalone[width=.3\textwidth]{roots_8} }
+%         $\overset{z \;\longmapsto\; z^2}{\xrightarrow{\hspace*{2cm}}}$
+%         \raisebox{-.5\height}{ \includestandalone[width=.3\textwidth]{roots_4} }
+%     \end{figure}
+%     Squaring the roots of unity, gives the roots of unity of half the order.
+% \end{frame}
+
 \begin{frame}
-    \centering
-    \textsc{Important point}
+    Let $W = e^\frac{-2 \pi i} N$ (notation from Cooley-Tukey).
+
     \begin{figure}
         \centering
-        \includestandalone[width=.5\textwidth]{roots_mirror}
+        \includestandalone[width=.4\textwidth]{roots_dft}
     \end{figure}
-    When N is even, every root has a ``friend'' with the opposite sign.
+
+    We can restate the DFT \eqref{eq:dft} as
+    \begin{equation}
+        X_k = \sum_{n=0}^{N-1} x_n W^{nk}
+        \label{eq:dftw}
+    \end{equation}
 \end{frame}
 
+\begin{frame}
+    \begin{equation*}
+        X_k = \sum_{n=0}^{N-1} x_n W^{nk}
+    \end{equation*}
+
+    \centering
+    So what is the DFT \textit{actually} doing?\\[1em]
+
+    \pause
+
+    \begin{figure}
+        \centering
+        \includestandalone[width=.4\textwidth]{roots_dft_k1}
+        \includestandalone[width=.4\textwidth]{roots_dft_k3}
+    \end{figure}
+
+    \scriptsize{Just multiplying our N array values by the Nth roots of unity!}
+\end{frame}
+
+\begin{frame}
+    \begin{equation*}
+        X_k = \sum_{n=0}^{N-1} x_n W^{nk}
+    \end{equation*}
+
+    \centering
+    So what is the DFT \textit{actually} doing?\\[1em]
+
+    \begin{figure}
+        \centering
+        \includestandalone[width=.4\textwidth]{roots_dft_k1}
+        \includestandalone[width=.4\textwidth]{roots_dft_k3}
+    \end{figure}
+
+    \scriptsize{$k$ is the ``stride'' along the roots of unity -- the ``frequency''.}
+
+    \tiny{(If $k$ is larger, we go faster around the circle)}
+\end{frame}
 
 \begin{frame}
     \centering
@@ -185,20 +263,150 @@
     \textit{\scriptsize Decomposing the DFT}
 \end{frame}
 
+
 \begin{frame}
     \begin{center}
-        \textsc{Simplifying assumption}\\[.5em]
-        $N$ is a power of two\\[1.5em]
+        \textsc{Foreshadowing}\\[.5em]
+        \scriptsize{\textsc{The goal} is to recursively decompse the DFT in such a way that {\em intermediate calculations}
+        are {\em overlapping} or {\em symmetrically opposite} on the unit circle.}\\[1em]
+
+        \tiny{Thus, they may be reused directly or by simply a change of sign.}
     \end{center}
 \end{frame}
 
 \begin{frame}
-    Let $W = e^\frac{-2 \pi i} N$ (notation from Cooley-Tukey).
+    \centering
+    We can decompose \eqref{eq:dftw} into a a sum of sums:
+    \begin{align*}
+        X_k &= \sum_{n=0}^{N-1} x_n W^{nk} \\
+            &= \underbrace{\sum_{n=0}^{\mathclap{N/2-1}} x_{2n}    W^{(2n)  k}}_{\text{Even indices}}            
+             + \underbrace{\sum_{n=0}^{\mathclap{N/2-1}} x_{2n+1}  W^{(2n+1)k}}_{\text{Odd indices}}
+    \end{align*}
+    \tiny{We can just as well decompose it in three sums that sum every 3rd value and so on.}\\[1em]
+\end{frame}
 
-    We can restate \eqref{eq:dft} as
-    \begin{equation}
-        X_k = \sum_n x_n W^{nk}
-    \end{equation}
+\begin{frame}
+    \centering
+    \textsc{Remember}\\[1em]
+    \small{An N-point DFT uses the Nth roots of unity!}
+\end{frame}
+
+\begin{frame}
+    \begin{figure}
+        \centering
+        \begin{minipage}{.4\textwidth}
+            \centering
+            \includestandalone[width=\textwidth]{roots_dft_even}
+            $$\sum_{n=0}^{\mathclap{N/2-1}} x_{2n}{\color{\MyGreen}W}^{{\color{\MyGreen}2n}k}$$
+        \end{minipage}
+        \begin{minipage}{.4\textwidth}
+            \centering
+            \includestandalone[width=\textwidth]{roots_dft_odd}
+            $$\sum_{n=0}^{\mathclap{N/2-1}} x_{2n+1}{\color{\MyRed}W}^{{\color{\MyRed}(2n+1)}k}$$
+        \end{minipage}
+    \end{figure}
+    \centering
+    \small{The odd-index sum does not use  the N/2th roots of unity.}
+\end{frame}
+
+\begin{frame}
+    \begin{figure}
+        \centering
+        \begin{minipage}{.4\textwidth}
+            \centering
+            \includestandalone[width=\textwidth]{roots_dft_even}
+            $$\sum_{n=0}^{\mathclap{N/2-1}} x_{2n}{\color{\MyGreen}W}^{{\color{\MyGreen}2n}k}$$
+        \end{minipage}
+        \begin{minipage}{.4\textwidth}
+            \centering
+            \includestandalone[width=\textwidth]{roots_dft_odd}
+            $$\sum_{n=0}^{\mathclap{N/2-1}} x_{2n+1}{\color{\MyRed}W}^{{\color{\MyRed}(2n+1)}k}$$
+        \end{minipage}
+    \end{figure}
+    \centering
+    \small{It is clearly not a proper N/2-point DFT!}
+\end{frame}
+
+\begin{frame}
+    \begin{figure}
+        \centering
+        \begin{minipage}{.4\textwidth}
+            \centering
+            \includestandalone[width=\textwidth]{roots_dft_even}
+            $$\sum_{n=0}^{\mathclap{N/2-1}} x_{2n}{\color{\MyGreen}W}^{{\color{\MyGreen}2n}k}$$
+        \end{minipage}
+        \begin{minipage}{.4\textwidth}
+            \centering
+            \includestandalone[width=\textwidth]{roots_dft_odd_fix}
+            $${\color{\MyRed}W^k}\sum_{n=0}^{
+                \mathclap{N/2-1}} x_{2n+1}{\color{\MyGreen}W}^{{\color{\MyGreen}2n}k}$$
+        \end{minipage}
+    \end{figure}
+    \centering
+    \small{Factor out $W^k$ to get what seems like a proper DFT.}
+\end{frame}
+
+\begin{frame}
+    \centering
+    \textsc{Correct decomposition of the DFT}
+    \begin{alignat}{3}
+        X_k &=                       {\color{\MyBlue}  \sum_{n=0}^{\mathclap{N/2-1}} x_{2n}   \tikzmark{a}W^{2nk}}
+                &&+ \tikzmark{b} W^k {\color{\MyOrange}\sum_{n=0}^{\mathclap{N/2-1}} x_{2n+1} \tikzmark{c}W^{2nk}}
+                \label{eq:decomposed}
+    \end{alignat}\\[1em]
+
+    \onslide<2->{
+        % putting the picture after \pause breaks it for some reason
+        % but this accomplishes the same thing
+    \begin{tikzpicture}[remember picture,overlay]
+        \draw[<-] ([shift={(.5em,-4pt)}]pic cs:a) -- ([shift={(0pt,-20pt)}]pic cs:a) 
+            node[anchor=north] {\small \bf \color{\MyRed} !}; 
+        \draw[<-] ([shift={(.5em,-4pt)}]pic cs:b) -- ([shift={(0pt,-20pt)}]pic cs:b) 
+            node[anchor=north] {\small \bf \color{\MyRed} !}; 
+        \draw[<-] ([shift={(.5em,-4pt)}]pic cs:c) -- ([shift={(0pt,-20pt)}]pic cs:c) 
+            node[anchor=north] {\small \bf \color{\MyRed} !}; 
+    \end{tikzpicture}
+    }
+
+    \pause
+
+
+
+
+    But wait...\\[1em]
+
+    \small{${\color{\MyBlue}E_k}, {\color{\MyOrange}O_k}$ is supposedly N/2-point DFTs,
+        but $0 \leq k < N$?
+    }
+
+\end{frame}
+
+\begin{frame}
+    \centering
+    \textsc{$\overset{\mathclap{\text{Almost correct}}}{\cancel{\text{Correct}}}$
+        decomposition of the DFT}
+    \begin{alignat}{3}
+        X_k &=                       {\color{\MyBlue}  \sum_{n=0}^{\mathclap{N/2-1}} x_{2n}   \tikzmark{d}W^{2nk}}
+                &&+ \tikzmark{e} W^k {\color{\MyOrange}\sum_{n=0}^{\mathclap{N/2-1}} x_{2n+1} \tikzmark{f}W^{2nk}}
+                \tag{\ref{eq:decomposed}}
+    \end{alignat}\\[1em]
+
+    \begin{tikzpicture}[remember picture,overlay]
+        \draw[<-] ([shift={(.5em,-4pt)}]pic cs:d) -- ([shift={(0pt,-20pt)}]pic cs:d) 
+            node[anchor=north] {\small \bf \color{\MyRed} !}; 
+        \draw[<-] ([shift={(.5em,-4pt)}]pic cs:e) -- ([shift={(0pt,-20pt)}]pic cs:e) 
+            node[anchor=north] {\small \bf \color{\MyRed} !}; 
+        \draw[<-] ([shift={(.5em,-4pt)}]pic cs:f) -- ([shift={(0pt,-20pt)}]pic cs:f) 
+            node[anchor=north] {\small \bf \color{\MyRed} !}; 
+    \end{tikzpicture}
+
+    \Huge \emoji{face-with-raised-eyebrow}
+\end{frame}
+
+\begin{frame}
+    \centering
+    \tiny{\textsc{In fact}, the sums yield the correct result if evaluated directly for every $k$,
+    but fails to take advantage of any symmetry, and thus gives no performance benefit.}
 \end{frame}
 
 \begin{frame}
@@ -206,6 +414,93 @@
     \textsc{\large Gaining speed}\\
     \textit{\scriptsize Reusing intermediate results}
 \end{frame}
+
+\begin{frame}
+    \centering
+    Let's look closer at $W^{2nk}$\\[.5em]
+    \begin{figure}
+        \centering
+        \includestandalone[width=.6\textwidth]{roots_dft_w2nk_symm}
+    \end{figure}
+
+    \tiny{Upper half range of $W^{2nk}$ overlaps with lower half for $N=1$}
+\end{frame}
+
+\begin{frame}
+    \centering
+    \begin{figure}
+        \centering
+        \includestandalone[width=.6\textwidth]{roots_dft_w2nk_symm}
+    \end{figure}
+    {\tiny This holds in general:}
+    $$
+    W^{2n(k + N/2)}=W^{2nk} \underbrace{W^\frac{\cancel 2nN}{\cancel 2}}_{=1}=W^{2nk}
+    $$
+\end{frame}
+
+\begin{frame}
+    \centering
+    Now, let's look closer at $W^{k}$\\[.5em]
+    \begin{figure}
+        \centering
+        \includestandalone[width=.5\textwidth]{roots_dft_wnhalf}
+    \end{figure}
+    $$
+    W^{k+N/2} = W^k{\color{\MyBlue} W^{N/2}} = -W^k
+    $$
+
+    \tiny{Upper range of $W^k$ symmetrically opposite to lower range!}
+\end{frame}
+
+
+\begin{frame}
+    \begin{alignat}{3}
+        X_k &=                       {\color{\MyBlue}  \sum_{n=0}^{\mathclap{N/2-1}} x_{2n}   \tikzmark{g}W^{2nk}}
+                &&+ \tikzmark{h} W^k {\color{\MyOrange}\sum_{n=0}^{\mathclap{N/2-1}} x_{2n+1} \tikzmark{i}W^{2nk}}
+                \tag{\ref{eq:decomposed}}
+    \end{alignat}\\[1em]
+
+    \begin{tikzpicture}[remember picture,overlay]
+        \draw[<-] ([shift={(.5em,-.2em)}]pic cs:g) -- ([shift={(.0em,-1.5em)}]pic cs:g) 
+            node[anchor=north] {\tiny Overlapping}; 
+        \draw[<-] ([shift={(.5em,-.2em)}]pic cs:h) -- ([shift={(-.442em,-2.5em)}]pic cs:h) 
+            node[anchor=north] {\tiny Symmetrically opposite}; 
+        \draw[<-] ([shift={(.5em,-.2em)}]pic cs:i) -- ([shift={(.0em,-1.5em)}]pic cs:i) 
+            node[anchor=north] {\tiny Overlapping}; 
+    \end{tikzpicture}
+
+    \pause
+
+    \centering
+    \textsc{Decomposition}
+    \begin{equation}
+        \left\{
+            \begin{array}{lcl}
+                X_k       &=& {\color{\MyBlue}E_k} + W^k{\color{\MyOrange}O_k} \\
+                X_{k+N/2} &=& {\color{\MyBlue}E_{k}} - W^{k}{\color{\MyOrange}O_{k}}
+            \end{array}
+        \right.
+    \end{equation}
+    \scriptsize $k \in [0, N/2 - 1]$
+\end{frame}
+
+\begin{frame}
+    \centering
+    \textsc{Algorithm}
+    \begin{figure}
+        \centering
+        \includestandalone[width=.8\textwidth]{butterfly}
+    \end{figure}
+    \scriptsize{
+        \only<1>{$\Seq{x_n}$ ordered by index parity.}
+        \only<2>{Recursively compute the N/2-point FFTs $E$ and $O$.}
+        \only<3>{$X_0 = E_0 + W^0\!O_0$...}
+        \only<4>{...and so on for all $k < N/2$.}
+        \only<5>{$X_5 = E_0 - W^0\!O_0$...}
+        \only<6>{...and so on for all $k \geq N/2.$}
+    }
+\end{frame}
+
 
 \begin{frame}
     \frametitle{References}

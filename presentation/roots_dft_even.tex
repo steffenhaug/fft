@@ -12,26 +12,18 @@
 \draw[lightgray,->] (-\GRIDSIZE, 0) -- (\GRIDSIZE, 0)
     node[below] {\tiny Re};
 \draw (\GRIDSIZE, \GRIDSIZE) node {\scriptsize $\mathbb C$};
+\draw (-\GRIDSIZE, \GRIDSIZE) node {\scriptsize $k=1$};
 
 \draw[gray] (0, 0) circle (1);
 
 \def\N{8}
-
 \foreach \n in {0,...,\N}
 {
-    \coordinate (Z) at ({cos(-360*\n/\N)}, {sin(-360*\n/\N)});
-    \draw[fill=white] (Z) circle (.05);
-}
-
-
-\foreach \n in {0,...,7}
-{
-    \def\dr{1.3}
-    \coordinate (Z) at ({\dr*cos(-360*\n/\N)}, {\dr*sin(-360*\n/\N)});
-    \ifthenelse{\n=0 \OR \n=4} {
-        \node[yshift=.1em] at (Z) {\tiny $W^{\n}$};
+    \coordinate (Z) at ({cos(360*\n/\N)}, {sin(360*\n/\N)});
+    \ifthenelse{\n=8 \OR \n=2 \OR \n=4 \OR \n=6}{
+        \draw[fill=\MyGreen] (Z) circle (.05);
     }{
-        \node at (Z) {\tiny $W^{\n}$};
+        \draw[fill=white] (Z) circle (.05);
     }
 }
 
